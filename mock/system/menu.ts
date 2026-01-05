@@ -5,6 +5,7 @@ import type { ListDate } from '@/api/system/menu';
 const menuList = () => {
   const result: ListDate[] = [
     {
+      id: 1,
       label: 'Dashboard',
       key: 'dashboard',
       type: 1,
@@ -14,6 +15,7 @@ const menuList = () => {
       path: '/dashboard',
       children: [
         {
+          id: 2,
           label: '主控台',
           key: 'console',
           type: 1,
@@ -23,6 +25,7 @@ const menuList = () => {
           path: '/dashboard/console',
         },
         {
+          id: 3,
           label: '工作台',
           key: 'workplace',
           type: 1,
@@ -34,6 +37,7 @@ const menuList = () => {
       ],
     },
     {
+      id: 4,
       label: '表单管理',
       key: 'form',
       type: 1,
@@ -43,6 +47,7 @@ const menuList = () => {
       path: '/form',
       children: [
         {
+          id: 5,
           label: '基础表单',
           key: 'basic-form',
           type: 1,
@@ -52,6 +57,7 @@ const menuList = () => {
           path: '/form/basic-form',
         },
         {
+          id: 6,
           label: '分步表单',
           key: 'step-form',
           type: 1,
@@ -61,6 +67,7 @@ const menuList = () => {
           path: '/form/step-form',
         },
         {
+          id: 7,
           label: '表单详情',
           key: 'detail',
           type: 1,
@@ -77,7 +84,7 @@ const menuList = () => {
 };
 
 export default defineMock({
-  '/api/menu/list': () => {
+  '/api/sysMenu/tree': () => {
     const list = menuList();
     return resultSuccess({
       list,

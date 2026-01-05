@@ -39,6 +39,6 @@ const adminInfo = {
 };
 
 export default defineMock({
-  '[POST]/api/login': () => resultSuccess({ token }),
-  '/api/admin_info': () => resultSuccess(adminInfo),
+  '[POST]/api/sysUser/login': () => resultSuccess({ token }),
+  '/api/sysUser/userInfo': () => resultSuccess(adminInfo),
 });

@@ -9,18 +9,23 @@
         :label-width="100"
       >
         <n-form-item label="类型" path="type">
-          <span>{{ formParams.type === 1 ? '侧边栏菜单' : '' }}</span>
+          <n-radio-group v-model:value="formParams.type">
+            <n-space>
+              <n-radio :value="1">菜单</n-radio>
+              <n-radio :value="2">按钮</n-radio>
+            </n-space>
+          </n-radio-group>
         </n-form-item>
         <n-form-item label="标题" path="label">
           <n-input placeholder="请输入标题" v-model:value="formParams.label" />
         </n-form-item>
-        <n-form-item label="副标题" path="subtitle">
+        <n-form-item label="副标题" path="subtitle" v-if="formParams.type === 1">
           <n-input placeholder="请输入副标题" v-model:value="formParams.subtitle" />
         </n-form-item>
-        <n-form-item label="路径" path="path">
+        <n-form-item label="路径" path="path" v-if="formParams.type === 1">
           <n-input placeholder="请输入路径" v-model:value="formParams.path" />
         </n-form-item>
-        <n-form-item label="打开方式" path="openType">
+        <n-form-item label="打开方式" path="openType" v-if="formParams.type === 1">
           <n-radio-group v-model:value="formParams.openType" name="openType">
             <n-space>
               <n-radio :value="1">当前窗口</n-radio>
@@ -31,7 +36,7 @@
         <n-form-item label="菜单权限" path="auth">
           <n-input placeholder="请输入权限，多个权限用，分割" v-model:value="formParams.auth" />
         </n-form-item>
-        <n-form-item label="隐藏侧边栏" path="hidden">
+        <n-form-item label="隐藏侧边栏" path="hidden" v-if="formParams.type === 1">
           <n-switch v-model:value="formParams.hidden" />
         </n-form-item>
       </n-form>
@@ -47,21 +52,27 @@
 </template>
 
 <script lang="ts" setup>
-  import { reactive, ref, toRefs } from 'vue';
+  import { reactive, ref, toRefs, computed } from 'vue';
   import { useMessage } from 'naive-ui';
+  import { addMenu } from '@/api/system/menu';
 
-  const rules = {
-    label: {
-      required: true,
-      message: '请输入标题',
-      trigger: 'blur',
-    },
-    path: {
-      required: true,
-      message: '请输入路径',
-      trigger: 'blur',
-    },
-  };
+  const emit = defineEmits(['reload']);
+
+  // 表单验证规则
+  const rules = computed(() => {
+    return {
+      label: {
+        required: true,
+        message: '请输入标题',
+        trigger: 'blur',
+      },
+      path: {
+        required: formParams.value.type === 1,
+        message: '请输入路径',
+        trigger: 'blur',
+      },
+    };
+  });
 
   defineProps({
     title: {
@@ -76,6 +87,7 @@
 
   const message = useMessage();
   const formRef: any = ref(null);
+  // 表单默认值
   const defaultValueRef = () => ({
     label: '',
     type: 1,
@@ -84,36 +96,58 @@
     auth: '',
     path: '',
     hidden: false,
+    parentId: 0,
   });
+  // 表单参数
   const formParams = ref(defaultValueRef());
+
+  // 抽屉状态管理
   const state = reactive({
     isDrawer: false,
     subLoading: false,
     placement: 'right' as const,
   });
 
-  function openDrawer() {
+  // 打开抽屉
+  function openDrawer(parentId = 0) {
+    console.log(parentId);
     state.isDrawer = true;
+    formParams.value.parentId = Number(parentId);
   }
 
+  // 关闭抽屉
   function closeDrawer() {
     state.isDrawer = false;
   }
 
+  // 提交表单
   function formSubmit() {
-    formRef.value.validate((errors) => {
+    formRef.value.validate(async (errors) => {
       if (!errors) {
-        message.success('添加成功');
-        handleReset();
-        closeDrawer();
+        try {
+          state.subLoading = true;
+          await addMenu(formParams.value);
+          message.success('添加成功');
+          handleReset();
+          closeDrawer();
+          emit('reload');
+        } finally {
+          state.subLoading = false;
+        }
       } else {
         message.error('请填写完整信息');
       }
     });
   }
 
+  // 重置表单
   function handleReset() {
     formRef.value.restoreValidation();
     formParams.value = Object.assign(formParams.value, defaultValueRef());
   }
+
+  // 暴露方法给父组件
+  defineExpose({
+    openDrawer,
+  });
 </script>

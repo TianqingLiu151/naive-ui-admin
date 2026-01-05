@@ -3,6 +3,7 @@ import VueHook from 'alova/vue';
 import adapterFetch from 'alova/fetch';
 import { createAlovaMockAdapter } from '@alova/mock';
 import { isString } from 'lodash-es';
+import JSONBig from 'json-bigint';
 import mocks from './mocks';
 import { useUser } from '@/store/modules/user';
 import { storage } from '@/utils/Storage';
@@ -74,7 +75,18 @@ export const Alova = createAlova({
   },
   responded: {
     onSuccess: async (response, method) => {
-      const res = (response.json && (await response.json())) || response.body;
+      let res: any;
+      if (response && typeof response.text === 'function') {
+        const text = await response.text();
+        try {
+          const parser = JSONBig({ storeAsString: true });
+          res = parser.parse(text);
+        } catch (e) {
+          res = JSON.parse(text);
+        }
+      } else {
+        res = response.body;
+      }
 
       // 是否返回原生响应头 比如：需要获取响应头时使用该属性
       if (method.meta?.isReturnNativeResponse) {

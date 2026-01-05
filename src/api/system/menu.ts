@@ -1,5 +1,6 @@
 import { Alova } from '@/utils/http/alova/index';
 export interface ListDate {
+  id?: string | number;
   label: string;
   key: string;
   type: number;
@@ -22,7 +23,24 @@ export function adminMenus() {
  * @param params
  */
 export function getMenuList(params?) {
-  return Alova.Get<{ list: ListDate[] }>('/menu/list', {
+  return Alova.Get<ListDate[]>('/sysMenu/tree', {
     params,
   });
+}
+
+/**
+ * 新增菜单
+ * @param params
+ */
+export function addMenu(params) {
+  return Alova.Post('/sysMenu/create', params);
+}
+
+/**
+ * 更新菜单
+ * @param params
+ * @returns
+ */
+export function updateMenu(params) {
+  return Alova.Post<boolean>('/sysMenu/edit', params);
 }

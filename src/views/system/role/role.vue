@@ -211,8 +211,8 @@
 
   onMounted(async () => {
     const treeMenuList = await getMenuList();
-    expandedKeys.value = treeMenuList?.list.map((item) => item.key);
-    treeData.value = treeMenuList?.list;
+    expandedKeys.value = treeMenuList?.map((item) => item.key);
+    treeData.value = treeMenuList;
   });
 </script>
 

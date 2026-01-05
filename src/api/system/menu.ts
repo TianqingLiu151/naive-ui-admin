@@ -44,3 +44,12 @@ export function addMenu(params) {
 export function updateMenu(params) {
   return Alova.Post<boolean>('/sysMenu/edit', params);
 }
+
+/**
+ * 删除菜单
+ * @param params
+ * @returns
+ */
+export function deleteMenu(params) {
+  return Alova.Delete<boolean>(`/sysMenu/delete/${params.id}`);
+}

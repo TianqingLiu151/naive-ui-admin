@@ -130,7 +130,7 @@
         </n-card>
       </n-gi>
     </n-grid>
-    <CreateDrawer ref="createDrawerRef" :title="drawerTitle" />
+    <CreateDrawer ref="createDrawerRef" :title="drawerTitle" @reload="reloadTable" />
   </div>
 </template>
 <script lang="ts" setup>
@@ -141,7 +141,7 @@
   import { getTreeItem } from '@/utils';
   import CreateDrawer from './CreateDrawer.vue';
   import type { ListDate } from '@/api/system/menu';
-  import { updateMenu } from '@/api/system/menu';
+  import { updateMenu, deleteMenu } from '@/api/system/menu';
 
   // 表单验证规则
   const rules = computed(() => {
@@ -203,6 +203,7 @@
 
   // 编辑表单参数
   const formParams = reactive({
+    id: 0,
     type: 1,
     label: '',
     subtitle: '',
@@ -231,7 +232,6 @@
 
   // 选中树节点时的回调
   function selectedTree(keys) {
-    debugger;
     if (keys.length) {
       const treeItem = getTreeItem(unref(treeData), keys[0]);
       treeItemKey.value = keys;
@@ -252,8 +252,13 @@
       content: `您确定想删除此权限吗?`,
       positiveText: '确定',
       negativeText: '取消',
-      onPositiveClick: () => {
+      onPositiveClick: async () => {
+        await deleteMenu({ id: formParams.id });
         message.success('删除成功');
+        await reloadTable();
+        isEditMenu.value = false;
+        treeItemKey.value = [];
+        treeItemTitle.value = '';
       },
       onNegativeClick: () => {
         message.error('已取消');
@@ -274,6 +279,7 @@
         const res = await updateMenu(formParams);
         if (res) {
           message.success('更新成功');
+          await reloadTable();
         } else {
           message.error('更新失败');
         }
@@ -295,9 +301,9 @@
   // 初始化菜单数据
   async function initMenuData() {
     loading.value = true;
-    const treeMenuList = await getMenuList();
-    console.log(treeMenuList);
-    treeData.value = treeMenuList;
+    const method = getMenuList();
+    const treeMenuList = await method.send(true);
+    treeData.value = treeMenuList || [];
     loading.value = false;
   }
 
@@ -306,8 +312,8 @@
   });
 
   // 刷新列表
-  function reloadTable() {
-    initMenuData();
+  async function reloadTable() {
+    await initMenuData();
   }
 
   // 树节点展开/收起时的回调

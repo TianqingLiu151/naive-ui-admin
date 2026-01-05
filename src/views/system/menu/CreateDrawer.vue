@@ -110,9 +110,8 @@
 
   // 打开抽屉
   function openDrawer(parentId = 0) {
-    console.log(parentId);
     state.isDrawer = true;
-    formParams.value.parentId = Number(parentId);
+    formParams.value.parentId = parentId;
   }
 
   // 关闭抽屉

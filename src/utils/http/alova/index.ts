@@ -41,7 +41,7 @@ export const Alova = createAlova({
   baseURL: apiUrl,
   statesHook: VueHook,
   // 关闭全局请求缓存
-  // cacheFor: null,
+  cacheFor: null,
   // 全局缓存配置
   // cacheFor: {
   //   POST: {
@@ -87,19 +87,8 @@ export const Alova = createAlova({
       } else {
         res = response.body;
       }
-
-      // 是否返回原生响应头 比如：需要获取响应头时使用该属性
-      if (method.meta?.isReturnNativeResponse) {
-        return res;
-      }
       // 请根据自身情况修改数据结构
       const { message, code, result } = res;
-
-      // 不进行任何处理，直接返回
-      // 用于需要直接获取 code、result、 message 这些信息时开启
-      if (method.meta?.isTransformResponse === false) {
-        return res.data;
-      }
 
       // @ts-ignore
       const Message = window.$message;
@@ -107,27 +96,43 @@ export const Alova = createAlova({
       const Modal = window.$dialog;
 
       const LoginPath = PageEnum.BASE_LOGIN;
+
+      // 需要登录
+      if (code === 401) {
+        storage.clear();
+        window.location.href = LoginPath;
+        return;
+        // Modal?.warning({
+        //   title: '提示',
+        //   content: '登录身份已失效，请重新登录!',
+        //   okText: '确定',
+        //   closable: false,
+        //   maskClosable: false,
+        //   onOk: async () => {
+        //     storage.clear();
+        //     window.location.href = LoginPath;
+        //   },
+        // });
+      }
+
+      // 是否返回原生响应头 比如：需要获取响应头时使用该属性
+      if (method.meta?.isReturnNativeResponse) {
+        return res;
+      }
+
+      // 不进行任何处理，直接返回
+      // 用于需要直接获取 code、result、 message 这些信息时开启
+      if (method.meta?.isTransformResponse === false) {
+        return res.data;
+      }
+
       if (ResultEnum.SUCCESS === code) {
         return result;
       }
-      // 需要登录
-      if (code === 912) {
-        Modal?.warning({
-          title: '提示',
-          content: '登录身份已失效，请重新登录!',
-          okText: '确定',
-          closable: false,
-          maskClosable: false,
-          onOk: async () => {
-            storage.clear();
-            window.location.href = LoginPath;
-          },
-        });
-      } else {
-        // 可按需处理错误 一般情况下不是 912 错误，不一定需要弹出 message
-        Message?.error(message);
-        throw new Error(message);
-      }
+
+      // 可按需处理错误 一般情况下不是 912 错误，不一定需要弹出 message
+      Message?.error(message);
+      throw new Error(message);
     },
   },
 });

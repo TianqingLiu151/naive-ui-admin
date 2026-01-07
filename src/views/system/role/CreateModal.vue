@@ -9,6 +9,11 @@
 <script lang="ts" setup>
   import { FormSchema, useForm } from '@/components/Form';
   import { basicModal, useModal } from '@/components/Modal';
+  import { useMessage } from 'naive-ui';
+  import { createRole } from '@/api/system/role';
+
+  const emit = defineEmits(['reload']);
+  const message = useMessage();
 
   const schemas: FormSchema[] = [
     {
@@ -55,8 +60,15 @@
   async function okModal() {
     const formRes = await submit();
     if (formRes) {
-      closeModal();
-      console.log('formRes', formRes);
+      setSubLoading(true);
+      try {
+        await createRole(formRes);
+        message.success('创建成功');
+        closeModal();
+        emit('reload');
+      } catch (error) {
+        setSubLoading(false);
+      }
     } else {
       setSubLoading(false);
     }

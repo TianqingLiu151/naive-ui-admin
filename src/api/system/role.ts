@@ -45,3 +45,38 @@ export interface SysRole {
 export function getRoleList(params) {
   return Alova.Get<SysRole[]>('/sysRole/list', { params });
 }
+
+/**
+ * @description: 新增角色
+ */
+export function createRole(data: SysRole) {
+  return Alova.Post<SysRole>('/sysRole/create', data);
+}
+
+/**
+ * @description: 修改角色
+ */
+export function updateRole(data: SysRole) {
+  return Alova.Post<SysRole>('/sysRole/edit', data);
+}
+
+/**
+ * @description: 删除角色
+ */
+export function deleteRole(id: number) {
+  return Alova.Delete<SysRole>('/sysRole/delete/' + id);
+}
+
+/**
+ * @description: 更新角色菜单关联
+ */
+export function updateRoleMenu(data: { roleId: number; menuIds: number[] }) {
+  return Alova.Post('/sysRoleMenu/updateRoleMenus', data);
+}
+
+/**
+ * @description: 根据角色id获取菜单id列表
+ */
+export function getRoleMenuIds(roleId: number) {
+  return Alova.Get<number[]>('/sysRole/getRoleMenus/' + roleId);
+}

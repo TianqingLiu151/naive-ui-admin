@@ -7,9 +7,11 @@
 </template>
 
 <script lang="ts" setup>
-  import { nextTick } from 'vue';
+  import { nextTick, ref } from 'vue';
   import { FormSchema, useForm } from '@/components/Form';
   import { basicModal, useModal } from '@/components/Modal';
+  import { updateRole } from '@/api/system/role';
+  import { useMessage } from 'naive-ui';
 
   const schemas: FormSchema[] = [
     {
@@ -38,6 +40,10 @@
     },
   ];
 
+  const emit = defineEmits(['reload']);
+  const message = useMessage();
+  const currentId = ref(0);
+
   const [registerForm, { submit, setFieldsValue }] = useForm({
     gridProps: { cols: 1 },
     collapsedRows: 3,
@@ -55,6 +61,7 @@
 
   function showModal(record: any) {
     openModal();
+    currentId.value = record.id;
     nextTick(() => {
       record && setFieldsValue({ ...record });
     });
@@ -63,8 +70,15 @@
   async function okModal() {
     const formRes = await submit();
     if (formRes) {
-      closeModal();
-      console.log('formRes', formRes);
+      setSubLoading(true);
+      try {
+        await updateRole({ ...formRes, id: currentId.value });
+        message.success('修改成功');
+        closeModal();
+        emit('reload');
+      } catch (error) {
+        setSubLoading(false);
+      }
     } else {
       setSubLoading(false);
     }

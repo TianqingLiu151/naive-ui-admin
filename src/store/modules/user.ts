@@ -80,7 +80,7 @@ export const useUserStore = defineStore({
     async getInfo() {
       const data = await getUserInfoApi();
       const { result } = data;
-      if (result.permissions && result.permissions.length) {
+      if (result && result.permissions && result.permissions.length) {
         const permissionsList = result.permissions;
         this.setPermissions(permissionsList);
         this.setUserInfo(result);

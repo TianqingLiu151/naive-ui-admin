@@ -42,6 +42,7 @@
           :expandedKeys="expandedKeys"
           :checked-keys="checkedKeys"
           style="max-height: 950px; overflow: hidden"
+          key-field="id"
           @update:checked-keys="checkedTree"
           @update:expanded-keys="onExpandedKeys"
         />
@@ -59,25 +60,25 @@
         </n-space>
       </template>
     </n-modal>
-    <CreateModal ref="createModalRef" />
-    <EditModal ref="editModalRef" />
+    <CreateModal ref="createModalRef" @reload="reloadTable" />
+    <EditModal ref="editModalRef" @reload="reloadTable" />
   </div>
 </template>
 
 <script lang="ts" setup>
   import { reactive, ref, unref, h, onMounted } from 'vue';
-  import { useMessage } from 'naive-ui';
+  import { useMessage, useDialog } from 'naive-ui';
   import { BasicTable, TableAction } from '@/components/Table';
-  import { getRoleList } from '@/api/system/role';
+  import { getRoleList, deleteRole, updateRoleMenu, getRoleMenuIds } from '@/api/system/role';
   import { getMenuList } from '@/api/system/menu';
   import { columns } from './columns';
   import { PlusOutlined } from '@vicons/antd';
-  import { getTreeAll } from '@/utils';
   import CreateModal from './CreateModal.vue';
   import EditModal from './EditModal.vue';
   import type { ListDate } from '@/api/system/menu';
 
   const message = useMessage();
+  const dialog = useDialog();
   const actionRef = ref();
   const createModalRef = ref();
   const editModalRef = ref();
@@ -86,8 +87,9 @@
   const checkedAll = ref(false);
   const editRoleTitle = ref('');
   const treeData = ref<ListDate[]>([]);
-  const expandedKeys = ref<string[]>([]);
-  const checkedKeys = ref<string[]>(['console', 'step-form']);
+  const expandedKeys = ref<number[]>([]);
+  const checkedKeys = ref<number[]>([]);
+  const currentRoleId = ref(0);
 
   const params = reactive({
     name: 'NaiveAdmin',
@@ -140,7 +142,9 @@
       ...unref(params),
       ...res,
     };
-    return await getRoleList(_params);
+    const method = getRoleList(_params);
+    return await method.send(true);
+    // return await getRoleList(_params);
   };
 
   function addRole() {
@@ -155,15 +159,20 @@
     actionRef.value.reload();
   }
 
-  function confirmForm(e: any) {
+  async function confirmForm(e: any) {
     e.preventDefault();
     formBtnLoading.value = true;
-    setTimeout(() => {
-      showModal.value = false;
+    try {
+      await updateRoleMenu({ roleId: currentRoleId.value, menuIds: checkedKeys.value });
       message.success('提交成功');
+      showModal.value = false;
       reloadTable();
+    } catch (error) {
+      console.error(error);
+      message.error('提交失败');
+    } finally {
       formBtnLoading.value = false;
-    }, 200);
+    }
   }
 
   function handleEdit(record: Recordable) {
@@ -173,18 +182,31 @@
   }
 
   function handleDelete(record: Recordable) {
-    console.log('点击了删除', record);
-    message.info('点击了删除');
+    dialog.warning({
+      title: '提示',
+      content: '您确定要删除此角色吗？',
+      positiveText: '确定',
+      negativeText: '取消',
+      onPositiveClick: async () => {
+        await deleteRole(record.id);
+        message.success('删除成功');
+        reloadTable();
+      },
+      onNegativeClick: () => {},
+    });
   }
 
-  function handleMenuAuth(record: Recordable) {
+  async function handleMenuAuth(record: Recordable) {
+    currentRoleId.value = record.id;
     editRoleTitle.value = `分配 ${record.name} 的菜单权限`;
     checkedKeys.value = record.menu_keys;
+    //调用根据角色id获取菜单id列表接口
+    checkedKeys.value = await getRoleMenuIds(record.id);
     showModal.value = true;
   }
 
   function checkedTree(keys) {
-    checkedKeys.value = [checkedKeys.value, ...keys];
+    checkedKeys.value = keys;
   }
 
   function onExpandedKeys(keys) {
@@ -195,13 +217,13 @@
     if (expandedKeys.value.length) {
       expandedKeys.value = [];
     } else {
-      expandedKeys.value = treeData.value.map((item: any) => item.key) as [];
+      expandedKeys.value = treeData.value.map((item: any) => item.id) as [];
     }
   }
 
   function checkedAllHandle() {
     if (!checkedAll.value) {
-      checkedKeys.value = getTreeAll(treeData.value);
+      checkedKeys.value = getTreeIds(treeData.value);
       checkedAll.value = true;
     } else {
       checkedKeys.value = [];
@@ -209,9 +231,23 @@
     }
   }
 
+  function getTreeIds(data: any[]) {
+    const ids: any[] = [];
+    const traverse = (items: any[]) => {
+      items.forEach((item) => {
+        ids.push(item.id);
+        if (item.children) traverse(item.children);
+      });
+    };
+    traverse(data);
+    return ids;
+  }
+
   onMounted(async () => {
     const treeMenuList = await getMenuList();
-    expandedKeys.value = treeMenuList?.map((item) => item.key);
+    expandedKeys.value =
+      treeMenuList?.map((item) => item.id).filter((id): id is number => typeof id === 'number') ||
+      [];
     treeData.value = treeMenuList;
   });
 </script>

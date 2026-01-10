@@ -45,6 +45,7 @@
           key-field="id"
           @update:checked-keys="checkedTree"
           @update:expanded-keys="onExpandedKeys"
+          @update:indeterminate-keys="onIndeterminateKeys"
         />
       </div>
       <template #action>
@@ -92,6 +93,7 @@
   const treeData = ref<ListDate[]>([]);
   const expandedKeys = ref<number[]>([]);
   const checkedKeys = ref<number[]>([]);
+  const indeterminateKeys = ref<number[]>([]);
   const currentRoleId = ref(0);
 
   const params = reactive({
@@ -115,7 +117,7 @@
               return true;
             },
             // 根据权限控制是否显示: 有权限，会显示，支持多个
-            auth: ['basic_list'],
+            //auth: ['basic_list'],
           },
           {
             label: '关联用户',
@@ -123,7 +125,7 @@
             ifShow: () => {
               return true;
             },
-            auth: ['basic_list'],
+            //auth: ['basic_list'],
           },
           {
             label: '编辑',
@@ -173,8 +175,9 @@
   async function confirmForm(e: any) {
     e.preventDefault();
     formBtnLoading.value = true;
+    let menuIds = [...checkedKeys.value, ...indeterminateKeys.value];
     try {
-      await updateRoleMenu({ roleId: currentRoleId.value, menuIds: checkedKeys.value });
+      await updateRoleMenu({ roleId: currentRoleId.value, menuIds: menuIds });
       message.success('提交成功');
       showModal.value = false;
       reloadTable();
@@ -216,7 +219,9 @@
     editRoleTitle.value = `分配 ${record.name} 的菜单权限`;
     checkedKeys.value = record.menu_keys;
     //调用根据角色id获取菜单id列表接口
-    checkedKeys.value = await getRoleMenuIds(record.id);
+    const keys = await getRoleMenuIds(record.id);
+    checkedKeys.value = getLeafKeys(treeData.value, keys);
+    indeterminateKeys.value = [];
     showModal.value = true;
   }
 
@@ -226,6 +231,10 @@
 
   function onExpandedKeys(keys) {
     expandedKeys.value = keys;
+  }
+
+  function onIndeterminateKeys(keys: number[]) {
+    indeterminateKeys.value = keys;
   }
 
   function packHandle() {
@@ -240,9 +249,11 @@
     if (!checkedAll.value) {
       checkedKeys.value = getTreeIds(treeData.value);
       checkedAll.value = true;
+      indeterminateKeys.value = [];
     } else {
       checkedKeys.value = [];
       checkedAll.value = false;
+      indeterminateKeys.value = [];
     }
   }
 
@@ -258,6 +269,24 @@
     return ids;
   }
 
+  function getLeafKeys(tree: any[], keys: number[]) {
+    const leafKeys: number[] = [];
+    const keysSet = new Set(keys);
+    const traverse = (nodes: any[]) => {
+      nodes.forEach((node) => {
+        if (!node.children || node.children.length === 0) {
+          if (keysSet.has(node.id)) {
+            leafKeys.push(node.id);
+          }
+        } else {
+          traverse(node.children);
+        }
+      });
+    };
+    traverse(tree);
+    return leafKeys;
+  }
+
   onMounted(async () => {
     const treeMenuList = await getMenuList();
     expandedKeys.value =
@@ -267,4 +296,8 @@
   });
 </script>
 
-<style lang="less" scoped></style>
+<style lang="less" scoped>
+  .menu-list {
+    height: 400px;
+  }
+</style>

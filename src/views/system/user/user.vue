@@ -14,7 +14,7 @@
         :striped="true"
       >
         <template #tableTitle>
-          <n-button type="primary" @click="handleAdd">
+          <n-button v-permission="{ action: ['user-add'] }" type="primary" @click="handleAdd">
             <template #icon>
               <n-icon>
                 <PlusOutlined />

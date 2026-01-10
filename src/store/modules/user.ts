@@ -82,6 +82,7 @@ export const useUserStore = defineStore({
       const { result } = data;
       if (result && result.permissions && result.permissions.length) {
         const permissionsList = result.permissions;
+        console.log(permissionsList);
         this.setPermissions(permissionsList);
         this.setUserInfo(result);
       } else {

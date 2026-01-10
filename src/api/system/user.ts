@@ -16,7 +16,7 @@ export function getUserInfo() {
  * @description: 用户登录
  */
 export function login(params) {
-  return Alova.Post<InResult>('/sysUser/login', params, {
+  return Alova.Post<InResult>('/auth/login', params, {
     meta: {
       isReturnNativeResponse: true,
     },
@@ -34,7 +34,7 @@ export function changePassword(params, uid) {
  * @description: 用户登出
  */
 export function logout(params) {
-  return Alova.Post('/login/logout', {
+  return Alova.Post('/auth/logout', {
     params,
   });
 }

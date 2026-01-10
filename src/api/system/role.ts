@@ -80,3 +80,17 @@ export function updateRoleMenu(data: { roleId: number; menuIds: number[] }) {
 export function getRoleMenuIds(roleId: number) {
   return Alova.Get<number[]>('/sysRole/getRoleMenus/' + roleId);
 }
+
+/**
+ * @description: 获取角色关联的用户ID列表
+ */
+export function getRoleUserIds(roleId: number) {
+  return Alova.Get<number[]>('/sysRole/getRoleUsers/' + roleId);
+}
+
+/**
+ * @description: 更新角色关联的用户
+ */
+export function updateRoleUsers(data: { roleId: number; userIds: number[] }) {
+  return Alova.Post('/sysUserRole/updateRoleUsers', data);
+}

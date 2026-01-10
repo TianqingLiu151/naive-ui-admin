@@ -42,4 +42,11 @@ export default defineMock({
       list,
     });
   },
+  '[POST]/api/sysRole/updateRoleUsers': () => {
+    return resultSuccess(true);
+  },
+  // 匹配 /api/sysRole/getRoleUsers/{id}
+  [new RegExp('/api/sysRole/getRoleUsers/.*') as any]: () => {
+    return resultSuccess([1, 2]);
+  },
 });

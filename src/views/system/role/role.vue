@@ -62,6 +62,7 @@
     </n-modal>
     <CreateModal ref="createModalRef" @reload="reloadTable" />
     <EditModal ref="editModalRef" @reload="reloadTable" />
+    <RoleUserModal ref="roleUserModalRef" @reload="reloadTable" />
   </div>
 </template>
 
@@ -75,6 +76,7 @@
   import { PlusOutlined } from '@vicons/antd';
   import CreateModal from './CreateModal.vue';
   import EditModal from './EditModal.vue';
+  import RoleUserModal from './RoleUserModal.vue';
   import type { ListDate } from '@/api/system/menu';
 
   const message = useMessage();
@@ -82,6 +84,7 @@
   const actionRef = ref();
   const createModalRef = ref();
   const editModalRef = ref();
+  const roleUserModalRef = ref();
   const showModal = ref(false);
   const formBtnLoading = ref(false);
   const checkedAll = ref(false);
@@ -96,7 +99,7 @@
   });
 
   const actionColumn = reactive({
-    width: 250,
+    width: 320,
     title: '操作',
     key: 'action',
     fixed: 'right',
@@ -112,6 +115,14 @@
               return true;
             },
             // 根据权限控制是否显示: 有权限，会显示，支持多个
+            auth: ['basic_list'],
+          },
+          {
+            label: '关联用户',
+            onClick: handleUserAuth.bind(null, record),
+            ifShow: () => {
+              return true;
+            },
             auth: ['basic_list'],
           },
           {
@@ -179,6 +190,10 @@
     console.log('点击了编辑', record);
     // router.push({ name: 'basic-info', params: { id: record.id } });
     editModalRef.value.showModal(record);
+  }
+
+  function handleUserAuth(record: Recordable) {
+    roleUserModalRef.value.showModal(record);
   }
 
   function handleDelete(record: Recordable) {

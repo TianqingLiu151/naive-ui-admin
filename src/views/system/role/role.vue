@@ -113,7 +113,7 @@
               return true;
             },
             // 根据权限控制是否显示: 有权限，会显示，支持多个
-            //auth: ['basic_list'],
+            auth: ['role-menu'],
           },
           {
             label: '关联用户',
@@ -121,7 +121,7 @@
             ifShow: () => {
               return true;
             },
-            //auth: ['basic_list'],
+            auth: ['role-user'],
           },
           {
             label: '编辑',
@@ -129,7 +129,7 @@
             ifShow: () => {
               return true;
             },
-            auth: ['basic_list'],
+            auth: ['role-edit'],
           },
           {
             label: '删除',
@@ -139,7 +139,7 @@
               return true;
             },
             // 根据权限控制是否显示: 有权限，会显示，支持多个
-            auth: ['basic_list'],
+            auth: ['role-delete'],
           },
         ],
       });

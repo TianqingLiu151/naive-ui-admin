@@ -36,7 +36,7 @@
       <!--刷新-->
       <n-tooltip trigger="hover">
         <template #trigger>
-          <div class="table-toolbar-right-icon" @click="reload">
+          <div class="table-toolbar-right-icon" @click="reload()">
             <n-icon size="18">
               <ReloadOutlined />
             </n-icon>

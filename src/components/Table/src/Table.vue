@@ -236,7 +236,7 @@
     const tableEl: any = table?.$el;
     const headEl = tableEl.querySelector('.n-data-table-thead ');
     const { bottomIncludeBody } = getViewportOffset(headEl);
-    const headerH = 64;
+    const headerH = headEl ? headEl.offsetHeight : 64;
     let paginationH = 2;
     let marginH = 24;
     if (!isBoolean(unref(pagination))) {
@@ -272,6 +272,14 @@
     display: flex;
     justify-content: space-between;
     padding: 0 0 16px 0;
+
+    @media (max-width: 640px) {
+      flex-direction: column;
+
+      &-left {
+        margin-bottom: 12px;
+      }
+    }
 
     &-left {
       display: flex;

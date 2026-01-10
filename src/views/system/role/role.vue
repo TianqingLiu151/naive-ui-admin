@@ -1,10 +1,5 @@
 <template>
   <div>
-    <div class="n-layout-page-header">
-      <n-card :bordered="false" title="角色权限管理">
-        页面数据为 Mock 示例数据，非真实数据。
-      </n-card>
-    </div>
     <n-card :bordered="false" class="mt-4 proCard">
       <BasicTable
         :columns="columns"
@@ -13,6 +8,7 @@
         ref="actionRef"
         :actionColumn="actionColumn"
         @update:checked-row-keys="onCheckedRow"
+        :scroll-x="1090"
       >
         <template #tableTitle>
           <n-button type="primary" @click="addRole">

@@ -8,6 +8,14 @@ export interface ListDate {
   openType: number;
   auth: string;
   path: string;
+  name: string;
+  component: string;
+  redirect: string;
+  keepAlive: boolean;
+  activeMenu: string;
+  icon: string;
+  hidden: boolean;
+  sort: number;
   children?: ListDate[];
 }
 
@@ -15,7 +23,7 @@ export interface ListDate {
  * @description: 根据用户id获取用户菜单
  */
 export function adminMenus() {
-  return Alova.Get('/menus');
+  return Alova.Get<ListDate[]>('/sysMenu/userMenus');
 }
 
 /**

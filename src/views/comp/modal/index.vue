@@ -60,6 +60,8 @@
   import { basicModal, useModal } from '@/components/Modal';
   import { BasicForm, FormSchema, useForm } from '@/components/Form/index';
 
+  defineEmits(['register']);
+
   const schemas: FormSchema[] = [
     {
       field: 'name',

@@ -19,7 +19,7 @@
   import { getRoleUserIds, updateRoleUsers } from '@/api/system/role';
   import { useMessage } from 'naive-ui';
 
-  const emit = defineEmits(['reload']);
+  const emit = defineEmits(['reload', 'register']);
   const message = useMessage();
   const currentRoleId = ref(0);
   const targetKeys = ref<number[]>([]);

@@ -85,46 +85,55 @@ MAXVALUE 9223372036854775807
 START 1
 ),
   "parent_id" int8,
+  "path" varchar(255) COLLATE "pg_catalog"."default" NOT NULL,
+  "name" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
+  "component" varchar(255) COLLATE "pg_catalog"."default",
+  "redirect" varchar(255) COLLATE "pg_catalog"."default",
   "label" varchar(100) COLLATE "pg_catalog"."default" NOT NULL,
-  "menu_key" varchar(100) COLLATE "pg_catalog"."default",
-  "type" int4 NOT NULL,
   "subtitle" varchar(100) COLLATE "pg_catalog"."default",
-  "open_type" int4 DEFAULT 1,
-  "auth" varchar(255) COLLATE "pg_catalog"."default",
-  "path" varchar(255) COLLATE "pg_catalog"."default",
   "icon" varchar(100) COLLATE "pg_catalog"."default",
+  "type" int4 NOT NULL,
+  "auth" varchar(255) COLLATE "pg_catalog"."default",
+  "keep_alive" bool DEFAULT true,
   "is_hidden" bool DEFAULT false,
+  "open_type" int4 DEFAULT 1,
   "sort_order" int4 DEFAULT 0,
+  "active_menu" varchar(255) COLLATE "pg_catalog"."default",
   "created_at" timestamp(6) DEFAULT CURRENT_TIMESTAMP,
   CONSTRAINT "sys_menu_pkey" PRIMARY KEY ("id"),
-  CONSTRAINT "sys_menu_key_key" UNIQUE ("menu_key")
+  CONSTRAINT "sys_menu_name_key" UNIQUE ("name")
 )
 ;
 
 COMMENT ON TABLE "public"."sys_menu" IS '系统菜单表';
 COMMENT ON COLUMN "public"."sys_menu"."id" IS '菜单ID';
 COMMENT ON COLUMN "public"."sys_menu"."parent_id" IS '父菜单ID';
-COMMENT ON COLUMN "public"."sys_menu"."label" IS '菜单名称';
-COMMENT ON COLUMN "public"."sys_menu"."menu_key" IS '菜单标识';
-COMMENT ON COLUMN "public"."sys_menu"."type" IS '类型: 1-菜单, 2-按钮';
-COMMENT ON COLUMN "public"."sys_menu"."subtitle" IS '子标题';
-COMMENT ON COLUMN "public"."sys_menu"."open_type" IS '打开方式: 1-内部, 2-外部';
-COMMENT ON COLUMN "public"."sys_menu"."auth" IS '权限标识';
 COMMENT ON COLUMN "public"."sys_menu"."path" IS '路由路径';
+COMMENT ON COLUMN "public"."sys_menu"."name" IS '路由名称';
+COMMENT ON COLUMN "public"."sys_menu"."component" IS '组件路径';
+COMMENT ON COLUMN "public"."sys_menu"."redirect" IS '重定向路径';
+COMMENT ON COLUMN "public"."sys_menu"."label" IS '菜单名称';
+COMMENT ON COLUMN "public"."sys_menu"."subtitle" IS '子标题';
 COMMENT ON COLUMN "public"."sys_menu"."icon" IS '图标';
-COMMENT ON COLUMN "public"."sys_menu"."is_hidden" IS '是否隐藏: true-隐藏, false-显示';
+COMMENT ON COLUMN "public"."sys_menu"."type" IS '类型: 1-菜单, 2-按钮';
+COMMENT ON COLUMN "public"."sys_menu"."auth" IS '权限标识';
+COMMENT ON COLUMN "public"."sys_menu"."keep_alive" IS '是否缓存';
+COMMENT ON COLUMN "public"."sys_menu"."is_hidden" IS '是否隐藏';
+COMMENT ON COLUMN "public"."sys_menu"."open_type" IS '打开方式: 1-内部, 2-外部';
 COMMENT ON COLUMN "public"."sys_menu"."sort_order" IS '排序';
+COMMENT ON COLUMN "public"."sys_menu"."active_menu" IS '高亮菜单';
 
 -- ----------------------------
 -- Records of sys_menu
 -- ----------------------------
-INSERT INTO "public"."sys_menu" ("id", "parent_id", "label", "menu_key", "type", "subtitle", "open_type", "auth", "path", "sort_order", "is_hidden") VALUES (1, NULL, 'Dashboard', 'dashboard', 1, 'dashboard', 1, 'dashboard', '/dashboard', 1, false);
-INSERT INTO "public"."sys_menu" ("id", "parent_id", "label", "menu_key", "type", "subtitle", "open_type", "auth", "path", "sort_order", "is_hidden") VALUES (2, 1, '主控台', 'console', 1, 'console', 1, 'console', '/dashboard/console', 1, false);
-INSERT INTO "public"."sys_menu" ("id", "parent_id", "label", "menu_key", "type", "subtitle", "open_type", "auth", "path", "sort_order", "is_hidden") VALUES (3, 1, '工作台', 'workplace', 1, 'workplace', 1, 'workplace', '/dashboard/workplace', 2, false);
-INSERT INTO "public"."sys_menu" ("id", "parent_id", "label", "menu_key", "type", "subtitle", "open_type", "auth", "path", "sort_order", "is_hidden") VALUES (4, NULL, '表单管理', 'form', 1, 'form', 1, 'form', '/form', 2, false);
-INSERT INTO "public"."sys_menu" ("id", "parent_id", "label", "menu_key", "type", "subtitle", "open_type", "auth", "path", "sort_order", "is_hidden") VALUES (5, 4, '基础表单', 'basic-form', 1, 'basic-form', 1, 'basic-form', '/form/basic-form', 1, false);
-INSERT INTO "public"."sys_menu" ("id", "parent_id", "label", "menu_key", "type", "subtitle", "open_type", "auth", "path", "sort_order", "is_hidden") VALUES (6, 4, '分步表单', 'step-form', 1, 'step-form', 1, 'step-form', '/form/step-form', 2, false);
-INSERT INTO "public"."sys_menu" ("id", "parent_id", "label", "menu_key", "type", "subtitle", "open_type", "auth", "path", "sort_order", "is_hidden") VALUES (7, 4, '表单详情', 'detail', 1, 'detail', 1, 'detail', '/form/detail', 3, false);
+INSERT INTO "public"."sys_menu" ("id", "parent_id", "path", "name", "component", "redirect", "label", "subtitle", "type", "open_type", "auth", "sort_order", "is_hidden") VALUES 
+(1, NULL, '/dashboard', 'Dashboard', 'LAYOUT', '/dashboard/console', 'Dashboard', 'dashboard', 1, 1, 'dashboard', 1, false),
+(2, 1, 'console', 'dashboard_console', '/dashboard/console/console', NULL, '主控台', 'console', 1, 1, 'console', 1, false),
+(3, 1, 'workplace', 'dashboard_workplace', '/dashboard/workplace/workplace', NULL, '工作台', 'workplace', 1, 1, 'workplace', 2, false),
+(4, NULL, '/form', 'form', 'LAYOUT', NULL, '表单管理', 'form', 1, 1, 'form', 2, false),
+(5, 4, 'basic-form', 'basic-form', '/form/basic-form', NULL, '基础表单', 'basic-form', 1, 1, 'basic-form', 1, false),
+(6, 4, 'step-form', 'step-form', '/form/step-form', NULL, '分步表单', 'step-form', 1, 1, 'step-form', 2, false),
+(7, 4, 'detail', 'detail', '/form/detail', NULL, '表单详情', 'detail', 1, 1, 'detail', 3, false);
 
 -- ----------------------------
 -- Table structure for sys_user_role

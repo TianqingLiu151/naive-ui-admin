@@ -12,7 +12,7 @@
   import { useMessage } from 'naive-ui';
   import { createRole } from '@/api/system/role';
 
-  const emit = defineEmits(['reload']);
+  const emit = defineEmits(['reload', 'register']);
   const message = useMessage();
 
   const schemas: FormSchema[] = [

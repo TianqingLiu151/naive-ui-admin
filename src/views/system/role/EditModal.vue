@@ -40,7 +40,7 @@
     },
   ];
 
-  const emit = defineEmits(['reload']);
+  const emit = defineEmits(['reload', 'register']);
   const message = useMessage();
   const currentId = ref(0);
 

@@ -25,6 +25,27 @@
         <n-form-item label="路径" path="path" v-if="formParams.type === 1">
           <n-input placeholder="请输入路径" v-model:value="formParams.path" />
         </n-form-item>
+        <n-form-item label="路由名称" path="name" v-if="formParams.type === 1">
+          <n-input placeholder="请输入路由名称" v-model:value="formParams.name" />
+        </n-form-item>
+        <n-form-item label="组件路径" path="component" v-if="formParams.type === 1">
+          <n-input
+            placeholder="请输入组件路径 (如 /system/user/index)"
+            v-model:value="formParams.component"
+          />
+        </n-form-item>
+        <n-form-item label="图标" path="icon" v-if="formParams.type === 1">
+          <n-input placeholder="请输入图标名称" v-model:value="formParams.icon" />
+        </n-form-item>
+        <n-form-item label="重定向" path="redirect" v-if="formParams.type === 1">
+          <n-input placeholder="请输入重定向地址" v-model:value="formParams.redirect" />
+        </n-form-item>
+        <n-form-item label="高亮菜单" path="activeMenu" v-if="formParams.type === 1">
+          <n-input placeholder="请输入高亮菜单的路由名称" v-model:value="formParams.activeMenu" />
+        </n-form-item>
+        <n-form-item label="排序" path="sort">
+          <n-input-number v-model:value="formParams.sort" />
+        </n-form-item>
         <n-form-item label="打开方式" path="openType" v-if="formParams.type === 1">
           <n-radio-group v-model:value="formParams.openType" name="openType">
             <n-space>
@@ -38,6 +59,9 @@
         </n-form-item>
         <n-form-item label="隐藏侧边栏" path="hidden" v-if="formParams.type === 1">
           <n-switch v-model:value="formParams.hidden" />
+        </n-form-item>
+        <n-form-item label="是否缓存" path="keepAlive" v-if="formParams.type === 1">
+          <n-switch v-model:value="formParams.keepAlive" />
         </n-form-item>
       </n-form>
 
@@ -64,6 +88,11 @@
       label: {
         required: true,
         message: '请输入标题',
+        trigger: 'blur',
+      },
+      name: {
+        required: true,
+        message: '请输入路由名称',
         trigger: 'blur',
       },
       path: {
@@ -95,6 +124,13 @@
     openType: 1,
     auth: '',
     path: '',
+    name: '',
+    component: '',
+    redirect: '',
+    activeMenu: '',
+    icon: '',
+    sort: 1,
+    keepAlive: true,
     hidden: false,
     parentId: 0,
   });
